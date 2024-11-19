@@ -1,0 +1,254 @@
+\documentclass[12pt,openany]{book}
+
+% --- Packages ---
+\usepackage{fontspec} % For loading custom fonts
+\setmainfont{Noto Serif} % Sets Noto Serif as the main font
+\usepackage[backend=bibtex,style=ieee]{biblatex}
+\usepackage{amsmath, amssymb, exscale} % For math formatting
+\usepackage{unicode-math}
+\usepackage{listings}
+%\setmathfont{Latin Modern Math} % Font for math
+\setmathfont{XITS Math} % Otra opción estética
+%\setmathfont{Libertinus Math} % Otra opción estética
+
+\usepackage{graphicx} % For including images
+\usepackage{fancyhdr} % For custom headers and footers
+\usepackage{titlesec} % For section formatting
+\usepackage{hyperref} % For clickable links in PDF
+\usepackage{geometry} % For page margins
+\usepackage{enumitem} % For customizing lists
+\usepackage[dvipsnames]{xcolor} % For custom colors
+\usepackage{tcolorbox} % For colored boxes around definitions/examples
+\usepackage[spanish]{babel}
+\usepackage{csquotes}
+
+\addbibresource{referencias.bib}
+
+\setlength{\parindent}{0pt} % Removes indent for paragraphs
+\setlength{\parskip}{1\baselineskip} % Adds space between paragraphs jumps
+
+% Ajuste de espacio alrededor de listas
+\setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0.5\baselineskip}
+\setlist[enumerate]{topsep=0pt, partopsep=0pt, parsep=0pt, itemsep=0.5\baselineskip}
+
+
+% --- Custom Colors ---
+\definecolor{coverblue}{HTML}{00baa7} % Dark blue for background
+\definecolor{red}{HTML}{662549} % granate
+\definecolor{green}{HTML}{57a5a0} % verde azulado
+\definecolor{purple}{HTML}{C2A6D8} % lila pastel
+\definecolor{blue}{HTML}{92C7CF} % azul pastel
+\definecolor{navy}{HTML}{2E3A59} % azul marino
+\definecolor{pink}{HTML}{F0687B} % rosa coral
+\definecolor{orange}{HTML}{F3B664} % naranja pastel
+\definecolor{yellow}{HTML}{FED976} % amarillo pastel
+\definecolor{cream}{HTML}{f2f3f7} % cerca del blanco
+
+% Definición de colores Catppuccin Mocha
+\definecolor{catppuccinRosewater}{HTML}{f5e0dc}
+\definecolor{catppuccinFlamingo}{HTML}{f2cdcd}
+\definecolor{catppuccinPink}{HTML}{f5c2e7}
+\definecolor{catppuccinMauve}{HTML}{cba6f7}
+\definecolor{catppuccinRed}{HTML}{f38ba8}
+\definecolor{catppuccinMaroon}{HTML}{eba0ac}
+\definecolor{catppuccinPeach}{HTML}{fab387}
+\definecolor{catppuccinYellow}{HTML}{f9e2af}
+\definecolor{catppuccinGreen}{HTML}{a6e3a1}
+\definecolor{catppuccinTeal}{HTML}{94e2d5}
+\definecolor{catppuccinSky}{HTML}{89dceb}
+\definecolor{catppuccinSapphire}{HTML}{74c7ec}
+\definecolor{catppuccinBlue}{HTML}{89b4fa}
+\definecolor{catppuccinLavender}{HTML}{b4befe}
+\definecolor{catppuccinText}{HTML}{cdd6f4}
+\definecolor{catppuccinSubtext1}{HTML}{bac2de}
+\definecolor{catppuccinSubtext0}{HTML}{a6adc8}
+\definecolor{catppuccinOverlay2}{HTML}{9399b2}
+\definecolor{catppuccinOverlay1}{HTML}{7f849c}
+\definecolor{catppuccinOverlay0}{HTML}{6c7086}
+\definecolor{catppuccinSurface2}{HTML}{585b70}
+\definecolor{catppuccinSurface1}{HTML}{45475a}
+\definecolor{catppuccinSurface0}{HTML}{313244}
+\definecolor{catppuccinBase}{HTML}{1e1e2e}
+\definecolor{catppuccinMantle}{HTML}{181825}
+\definecolor{catppuccinCrust}{HTML}{11111b}
+
+% --- Application of the colors ---
+\colorlet{textColor}{navy}
+
+
+% Configurar la fuente para los bloques de código
+\setmonofont{Cascadia Code}[
+    Contextuals=Alternate, % Habilita ligaduras
+    Scale=0.9              % Opcional: ajusta el tamaño de la fuente
+]
+
+% --- Listings Configuration for Code Coloring ---
+\lstset{
+    backgroundcolor=\color{catppuccinBase},          % Fondo oscuro (Base)
+    basicstyle=\ttfamily\color{catppuccinText},      % Fuente base (Texto principal)
+    keywordstyle=\color{catppuccinMauve}\bfseries,  % Palabras clave (Mauve)
+    commentstyle=\color{catppuccinGreen},           % Comentarios (Green)
+    stringstyle=\color{catppuccinPeach},            % Cadenas (Peach)
+    numberstyle=\color{catppuccinOverlay1},         % Números de línea (Overlay1)
+    numbers=left,                                   % Números de línea a la izquierda
+    numbersep=15pt,                                 % Separación entre números y código
+    frame=none,                                     % Sin marco
+    xleftmargin=35pt,                               % Márgenes izquierdo
+    %xrightmargin=20pt,                              % Márgenes derecho
+    framexleftmargin=35pt,                          % Espacio adicional para los números
+    framexrightmargin=0pt,                          % Ajustar borde derecho
+    framesep=5pt,                                   % Padding interno adicional
+    breaklines=true,                                % Saltos de línea automáticos
+    showstringspaces=false,                         % Ocultar espacios en cadenas
+    keepspaces=true,                                % Mantener espacios
+    columns=fullflexible,                            % Alineación correcta
+}
+
+
+
+
+% --- Define Variables ---
+\newcommand{\courseName}{Bases de Datos con SQL} % Course name
+\newcommand{\studentName}{Ernesto Martínez Gómez} % Student name
+
+% --- Header and Footer ---
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[L]{\textcolor{textColor}{\leftmark}} % Chapter title on the left
+\fancyhead[R]{\textcolor{textColor}{\studentName}} % Student name on the right
+\fancyfoot[C]{\textcolor{textColor}{\thepage}} % Page number in footer
+
+% --- Section Formatting ---
+\titleformat{\chapter}{\LARGE\bfseries\color{textColor}}{\thechapter}{1em}{}
+\titleformat{\section}{\Large\bfseries\color{textColor}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{textColor}}{\thesubsection}{1em}{}
+
+% Ajuste de capítulos
+\titlespacing*{\chapter}
+{0pt}   % Sangría izquierda
+{20pt}  % Espacio antes del capítulo
+{10pt}  % Espacio después del capítulo
+
+% Ajuste de secciones
+\titlespacing*{\section}
+{0pt}   % Sangría izquierda
+{12pt}  % Espacio antes de la sección
+{6pt}   % Espacio después de la sección
+
+% Ajuste de subsecciones
+\titlespacing*{\subsection}
+{0pt}   % Sangría izquierda
+{10pt}  % Espacio antes de la subsección
+{5pt}   % Espacio después de la subsección
+
+% --- Custom Environments for Notes ---
+\newtcolorbox{definitionbox}[2][]{%
+	colback=cream, % Background color
+	colframe=blue, % Frame color
+	coltitle=black, % Title text color
+	fonttitle=\bfseries, % Font style for the title
+	title=\textbf{#2}, % Custom title without numbering
+	boxrule=0.5mm, % Border thickness
+	#1 % Optional argument for additional settings (like label)
+}
+
+\newtcolorbox{examplebox}[2][]{%
+	colback=cream, % Background color
+	colframe=green, % Frame color
+	coltitle=cream, % Title text color
+	fonttitle=\bfseries, % Font style for the title
+	title=\textbf{#2}, % Custom title without numbering
+	boxrule=0.5mm, % Border thickness
+	#1 % Optional argument for additional settings (like label)
+}
+
+\newtcolorbox{theorembox}[2][]{%
+	colback=cream, % Background color
+	colframe=purple, % Frame color
+	coltitle=black, % Title text color
+	fonttitle=\bfseries, % Font style for the title
+	title=\textbf{#2}, % Custom title without numbering
+	boxrule=0.5mm, % Border thickness
+	#1 % Optional argument for additional settings (like label)
+}
+
+\newtcolorbox{exercisebox}[2][]{%
+	colback=cream, % Background color
+	colframe=orange, % Frame color
+	coltitle=black, % Title text color
+	fonttitle=\bfseries, % Font style for the title
+	title=\textbf{#2}, % Custom title without numbering
+	boxrule=0.5mm, % Border thickness
+	#1 % Optional argument for additional settings (like label)
+}
+
+% --- Begin Document ---
+\begin{document}
+	
+	% Set default text color
+	\color{textColor}
+	
+	% Set smaller margin for the title page only
+	\newgeometry{top=1cm, left=1cm, right=1cm, bottom=1in}
+	
+	% Cover Page Layout
+	\begin{titlepage}
+		\centering
+		\vspace*{3.5cm}
+		
+		% Title Box
+		\begin{tcolorbox}[
+			colback=coverblue, 
+			colframe=coverblue, 
+			width=1\textwidth, 
+			boxrule=0mm, 
+			arc=3mm,      % Esquinas redondeadas
+			boxsep=5mm,   % Espacio interno (padding)
+			left=5mm
+			]
+			\raggedright % Alinea el texto a la izquierda sin justificar
+			\fontsize{64}{78}\selectfont % Tamaño de fuente personalizado
+			\bfseries\textcolor{white}{
+				\courseName
+			}
+		\end{tcolorbox}
+		
+		
+		% Image slightly overlapping the title box
+		\vspace{-1.5cm} % Adjust this value to control the overlap
+		\includegraphics[width=0.9\textwidth]{dodge_car_2.png} % Replace with your image path
+		
+		% Author's Name in Sans-Serif at Bottom Right
+		\vfill
+		\hfill \Large\bfseries\sffamily \studentName
+		
+	\end{titlepage}
+	
+	% Restore the original margin settings
+	\newgeometry{margin=1in} % Explicitly set the original 1-inch margin
+	
+	% Front Matter (Table of Contents, etc.)
+	\frontmatter
+	\pagestyle{plain} % Suppress headers in front matter
+	
+	% Temporarily override double page clearing
+	\let\cleardoublepage\clearpage
+	
+	\tableofcontents
+	
+	% Restore the original double page clearing for the main content
+	\let\cleardoublepage\relax
+	
+	% Restore header style for main matter
+	\mainmatter
+
+	\pagestyle{fancy}
+	
+	\input{creacion_bbdd.tex}
+	\input{cte.tex}
+	\input{normalizacion.tex}
+	\input{particiones_tablas.tex}
+	
+	\printbibliography
+	
+\end{document}

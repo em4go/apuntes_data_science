@@ -1,0 +1,128 @@
+\chapter{CTEs: Common Table Expressions}
+
+\section{¿Qué es un CTE?}
+
+Un Common Table Expression (CTE) es una forma de crear una consulta
+temporal nombrada que puedes usar en la misma consulta SQL.
+Los CTEs hacen que las consultas sean más legibles y modulares,
+especialmente en escenarios complejos.
+
+\section{Ventajas de los CTEs}
+
+\begin{itemize}
+    \item \textbf{Legibilidad:} Los CTEs hacen que las consultas sean más fáciles de leer y mantener.
+    \item \textbf{Reutilización:} Puedes reutilizar un CTE en la misma consulta.
+    \item \textbf{Modularidad:} Puedes dividir una consulta compleja en partes más pequeñas y manejables.
+    \item \textbf{Alternativa a las subconsultas:} Ayudan a evitar consultas anidadas difíciles de leer.
+\end{itemize}
+
+\section{Sintaxis de un CTE}
+
+\begin{lstlisting}[language=SQL]
+WITH cte_name AS (
+    SELECT column1, column2
+    FROM table_name
+    WHERE condition
+)
+SELECT column1
+FROM cte_name
+WHERE another_condition;
+\end{lstlisting}
+
+\begin{examplebox}{Ejemplo de CTE}
+    Crea una consulta que muestre los empleados cuyo salario es mayor que el salario promedio de su departamento.
+\end{examplebox}
+
+\vspace{10pt}
+
+\begin{lstlisting}[language=SQL]
+WITH DepartmentAverage AS (
+    SELECT department_id, AVG(salary) AS avg_salary
+    FROM employees
+    GROUP BY department_id
+)
+SELECT e.emplyee_id, e.name, e.salary, e.department_id
+FROM employees e
+JOIN DepartmentAverage d
+ON e.department_id = d.department_id
+WHERE e.salary > d.avg_salary;
+\end{lstlisting}
+
+En este ejemplo, la consulta \texttt{DepartmentAverage} calcula el salario
+promedio por departamento. Luego, la consulta principal
+se une con el CTE \texttt{DepartmentAverage} para filtrar los empleados.
+
+De esta forma, los CTEs hacen que la consulta sea más legible y modular.
+
+\section{Cuándo usar CTEs}
+
+\begin{itemize}
+    \item \textbf{Dividir consultas complejas:} Cuando una consulta tiene múltiples niveles de anidación o subconsultas difíciles de leer
+    \item \textbf{Evitar redundancia:} Si necesitas reutilizar una subconsulta en la misma consulta.
+    \item \textbf{Mejorar la legibilidad:} Para hacer que la consulta sea más fácil de entender y mantener.
+    \item \textbf{Recursión:} Cuando trabajas con datos jerárquicos o necesitas realizar cálculos iterativos (recursividad).
+\end{itemize}
+
+\section{CTEs Recursivos}
+
+Un CTE recursivo es un CTE que se referencia a sí mismo en la definición.
+Es útil para trabajar con datos jerárquicos, como estructuras de árbol
+(ej. una tabla de empleados y sus jefes)
+
+\subsection{Sintaxis de un CTE Recursivo}
+
+\begin{lstlisting}[language=SQL]
+WITH RECURSIVE cte_name AS (
+    -- Anchor Member: Define la base de la recursión
+    SELECT column1, column2
+    FROM table_name
+    WHERE condition
+
+    UNION ALL
+
+    -- Recursive Member: Define cómo la recursión avanza
+    SELECT column1, column2
+    FROM table_name
+    JOIN cte_name
+    ON table_name.column = cte_name.column
+)
+SELECT *
+FROM cte_name;
+\end{lstlisting}
+
+\begin{examplebox}{Ejemplo de CTE Recursivo}
+    Crea una consulta que muestre la jerarquía de empleados en una tabla de empleados.
+\end{examplebox}
+
+\vspace{10pt}
+
+\begin{lstlisting}[language=SQL]
+WITH RECURSIVE EmployeeHierarchy AS (
+    -- Anchor Member: el CEO no tiene jefe
+    SELECT employee_id, name, manager_id, 1 AS level
+    FROM employees e
+    WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- Recursive Member: Empleados con jefe
+    SELECT e.employee_id, e.name, e.manager_id, eh.level + 1
+    FROM employees e
+    JOIN EmployeeHierarchy eh
+    ON e.manager_id = eh.employee_id
+)
+SELECT *
+FROM EmployeeHierarchy
+ORDER BY level;
+\end{lstlisting}
+
+\section{Buenas Prácticas con CTEs}
+
+\begin{itemize}
+    \item \textbf{Usa nombres descriptivos:} Elige nombres significativos para los CTEs.
+    \item \textbf{Divide consultas complejas:} Usa un CTE por cada <<bloque lógico>> de la consulta.
+    \item \textbf{Evita CTEs innecesarios:} Si una consulta se puede escribir sin CTEs, no los uses por estética.
+    \item \textbf{Cuidado con el rendimiento:} Un CTE no se almacena físicamente y se evalúa cada vez que se referencia. Para reutilización intensiva, considera una tabla temporal.
+    \item \textbf{Limita la recursividad:} Asegúrate de establecer una condición de terminación en los CTEs recursivos para evitar bucles infinitos.
+\end{itemize}
+

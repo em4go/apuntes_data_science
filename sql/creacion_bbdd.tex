@@ -1,0 +1,253 @@
+\chapter{Creación de bases de datos}
+
+La creación de bases de datos y tablas es un proceso
+crítico que afecta al rendimiento, la organización y la
+escalabilidad de las apliaciones. En este capítulo se
+explican los conceptos básicos de la creación de bases
+de datos y tablas en MySQL.
+
+\section{Crear una base de datos}
+
+La base de datos es el contenedor lógico que almacena tablas,
+vistas, procedimientos almacenados, funciones y otros objetos.
+
+\subsection{Sintaxis}
+
+\begin{lstlisting}[language=SQL]
+CREATE DATABASE nombre_base_datos;
+[CHARACTER SET nombre_juego_caracteres]
+[COLLATE nombre_colacion];
+\end{lstlisting}
+
+\vspace{10pt}
+
+\subsection{Mejores prácticas}
+
+\begin{itemize}
+    \item \textbf{Utilizar nombres descriptivos.} Evitar nombres genéricos como \texttt{db}, \texttt{test}, etc.
+    \item \textbf{Utilizar minúsculas.} Los nombres de bases de datos y tablas son case insensitive en Windows, pero case sensitive en Linux por defecto.
+    \item \textbf{Utilizar guiones bajos o guiones.} Evitar espacios y otros caracteres especiales.
+    \item \textbf{Utilizar un juego de caracteres y colación adecuados.} Se recomienda utilizar \texttt{utf8mb4} y \texttt{utf8mb4\_unicode\_ci} respectivamente.
+    \item \textbf{Utilizar \texttt{IF NOT EXISTS}.} Evitar errores si la base de datos ya existe.
+\begin{lstlisting}[language=SQL]
+CREATE DATABASE IF NOT EXISTS tienda
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+\end{lstlisting}
+    \item \textbf{Versionamiento.} Incluye un esquema de versionamiento en la documentación o prefijos para reflejar cambios.
+\end{itemize}
+
+\section{Crear una tabla}
+
+Las tablas son la estructura principal donde se almacenan los datos.
+
+\subsection{Sintaxis}
+
+\begin{lstlisting}[language=SQL]
+CREATE TABLE nombre_tabla (
+    nombre_columna1 tipo_dato1 [restricciones],
+    nombre_columna2 tipo_dato2 [restricciones],
+    ...
+    [restricciones_tabla]
+);
+\end{lstlisting}
+
+\subsection{Buenas prácticas al diseñar tablas}
+
+\subsubsection{Definir la clave primaria}
+
+Asegúrate de que cada tabla tenga una clave primaria
+(\texttt{PRIMARY KEY}) que identifique de forma única
+cada registro.
+
+Las claves primarias suelen ser una columna auto incremental
+(\texttt{INT AUTO\_INCREMENT}) o un identificador único
+(UUID \texttt{CHAR(36)}).
+
+\begin{lstlisting}[language=SQL]
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    department_id INT,
+    hire_date DATE
+);
+\end{lstlisting}
+
+\subsubsection{Elige el tipo de datos correcto}
+
+Usa los tipos de datos adecuados para cada columna.
+Algunos tipos de datos comunes son:
+
+\begin{itemize}
+    \item \texttt{INT} para números enteros.
+    \item \texttt{DECIMAL} para números decimales.
+    \item \texttt{VARCHAR} para cadenas de texto.
+    \item \texttt{DATE} para fechas.
+    \item \texttt{ENUM} para listas de valores.
+    \item \texttt{TEXT} para texto largo.
+    \item \texttt{BLOB} para datos binarios.
+\end{itemize}
+
+Algunos tipos de datos específicos pueden ayudar a ahorrar espacio:
+\begin{itemize}
+    \item \texttt{TINYINT} para números pequeños. (0 a 255, 1B)
+    \item \texttt{SMALLINT} para números medianos. (-32,768 a 32,767, 2B)
+    \item \texttt{VARCHAR} para cadenas de texto cortas en lugar de \texttt{TEXT}.
+    \item \texttt{DECIMAL} para números decimales exactos en lugar de \texttt{FLOAT} o \texttt{DOUBLE}. \cite{decimalVsFloat}
+\end{itemize}
+
+\subsubsection{Normaliza la base de datos}
+
+La normalización es un proceso que se utiliza para organizar
+una base de datos en tablas y columnas para reducir la redundancia
+y mejorar la integridad de los datos. Véase \ref{ch:normalizacion}.
+
+Se resume en dividir los datos en varias tablas para eliminar
+redundancia y usar claves ajenas (\texttt{FOREIGN KEY}) para
+vincular las tablas.
+
+\subsubsection{Utiliza restricciones}
+
+Las restricciones (\texttt{CONSTRAINTS}) son reglas que se
+aplican a las columnas de una tabla. Algunas restricciones
+comunes son:
+
+\begin{itemize}
+    \item \texttt{NOT NULL} para evitar valores nulos.
+    \item \texttt{UNIQUE} para valores únicos.
+    \item \texttt{DEFAULT} para valores por defecto.
+    \item \texttt{CHECK} para validar valores.
+    \item \texttt{FOREIGN KEY} para referencias a otras tablas.
+\end{itemize}
+
+\begin{lstlisting}[language=SQL]
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    budget DECIMAL(10, 2) DEFAULT 0.00
+);
+\end{lstlisting}
+
+\subsubsection{Usa índices para mejorar el rendimiento}
+
+Define índices en columnas que se usen frecuentemente en
+consultas o en cláusulas \texttt{JOIN}.
+
+\begin{lstlisting}[language=SQL]
+CREATE INDEX idx_department_name ON departments(name);
+\end{lstlisting}
+
+\subsubsection{Nombres claros y consistentes}
+
+Usa nombres descriptivos y en minúsculas, separados por
+guiones bajos (\textit{snake case}). Por ejemplo:
+\texttt{employee\_details}, \texttt{order\_items}.
+
+\section{Relaciones entre tablas}
+
+Las relaciones entre tablas se establecen mediante claves
+ajenas (\texttt{FOREIGN KEY}). Estas aseguran la integridad
+referencial y permiten realizar consultas que unen datos
+de varias tablas.
+
+\begin{lstlisting}[language=SQL]
+CREATE TABLE orders (
+    order_id INT AUTO INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+\end{lstlisting}
+
+\subsection{Tipos de relaciones}
+
+\begin{itemize}
+    \item \textbf{Uno a uno (1:1).} Cada fila de una tabla se relaciona con una fila de otra tabla.
+    \item \textbf{Uno a muchos (1:N).} Cada fila de una tabla se relaciona con varias filas de otra tabla.
+    \item \textbf{Muchos a muchos (N:M).} Varias filas de una tabla se relacionan con varias filas de otra tabla.
+\end{itemize}
+
+\subsection{Buenas prácticas}
+
+\begin{itemize}
+    \item Usa \texttt{ON DELETE CASCADE} y \texttt{ON DELETE SET NULL} según sea necesario.
+    \item Define índices automáticamente en columnas con claves ajenas para acelerar consultas \texttt{JOIN}.
+\end{itemize}
+
+\section{Indexación}
+
+Los índices son estructuras de datos que mejoran la velocidad
+de las consultas al permitir a la base de datos buscar
+rápidamente los registros.
+
+\subsection{Tipos de índices}
+
+\begin{itemize}
+    \item \textbf{Índice primario.} Se crea automáticamente al definir una clave primaria.
+
+    \item \textbf{Índice único.} Garantiza que no haya valroes duplicados en una columna.
+    En MySQL, se crea automáticamente al definir una restricción \texttt{UNIQUE}.
+\begin{lstlisting}[language=SQL]
+CREATE UNIQUE INDEX idx_email on users(email);
+\end{lstlisting}
+
+    \item \textbf{Índice múltiple.} Se crea en varias columnas para acelerar consultas que usan esas columnas.
+\begin{lstlisting}[language=SQL]
+CREATE INDEX idx_id_date on orders(order_id, order_date);
+\end{lstlisting}
+\end{itemize}
+
+\subsection{¿Cuándo crear índices?}
+
+\begin{itemize}
+    \item En columnas que aparecen frecuentemente en cláusulas \texttt{WHERE} o \texttt{JOIN}.
+    \item En columnas usadas para ordenar (\texttt{ORDER BY}) o agrupar (\texttt{GROUP BY}).
+\end{itemize}
+
+\textbf{Nota:} No abuses de los índices, ya que pueden ralentizar
+las operaciones de escritura y ocupar espacio en disco.
+
+\section{Partición de tablas}
+
+La partición de tablas es una técnica que divide una tabla
+en fragmentos más pequeños para mejorar el rendimiento y
+la administración de la base de datos.
+
+Véase \ref{ch:particiones_tablas}.
+
+\section{Ejemplo completo}
+
+\begin{examplebox}{Ejemplo de creación de base de datos}
+    Crea una base de datos para almacenar empleados y departamentos.
+\end{examplebox}
+
+\vspace{10pt}
+
+\begin{lstlisting}[language=SQL]
+CREATE DATABASE IF NOT EXISTS company
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE company;
+
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    department_id INT,
+    hire_date DATE,
+    salary DECIMAL(10, 2) DEFAULT 0.00,
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+)
+
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    budget DECIMAL(10, 2) DEFAULT 0.00
+);
+
+CREATE INDEX idx_department_name ON departments(name);
+\end{lstlisting}
