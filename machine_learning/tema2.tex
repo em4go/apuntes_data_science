@@ -1,0 +1,29 @@
+\chapter{Tema 2: Optimización matemática}
+
+\section{Clasificación, regresión y optimización}
+
+Podemos definir un modelo como una función parametrizada por $\Theta$,
+que es un conjunto de parámetros.
+
+$$ \mathcal{F} = \{ f_\Theta : X \rightarrow Y, \quad \Theta \in \mathbb{R}^D \} $$
+
+Donde $X$ es el espacio de entrada y $Y$ el espacio de salida.
+
+En el caso de la clasificación, $Y$ es un conjunto finito de etiquetas
+
+$$ Y = \{1, 2, \ldots, C\} $$
+
+En el caso de la regresión, $Y$ es un conjunto continuo.
+
+$$ Y \equiv \mathbb{R} $$
+
+Y típicamente, $X \equiv \mathbb{R}^d$
+
+De esta forma, encontramos dos etapas en el ciclo de vida de un modelo:
+
+\begin{enumerate}
+    \item Entrenamiento: Ajustar los parámetros del modelo dado un conjunto de datos de entrenamiento.
+    $$\text{Dado } S \subset X \times Y \rightarrow \text{Estimar } \Theta \in \mathbb{R}^D$$
+    \item Evaluación: Medir la calidad del modelo en un conjunto de datos de prueba.
+    $$\text{Dados } \Theta y x \in X \rightarrow \text{Estimar } y \in Y = f_\Theta (x)$$
+\end{enumerate}

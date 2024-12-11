@@ -1,0 +1,89 @@
+\chapter{Tema 3: Redes neuronales}
+\section{Algoritmo backpropagation}
+Supongamos una red neuronal donde existen $L$ capas de $M_l$ neuronas cada una. Esta red neuronal sirve para solucionar un problema de regresión usando $J$ variables como regresoras, también llamadas características o \textit{features} para predecir $K$ variables.
+
+El entrenamiento de esta se compone de dos partes en cada \textit{epoch}:
+\begin{itemize}
+    \item \textit{Forward pass}: Se calcula la predicción y el error para los parámetros actuales.
+    \item \textit{Backward pass}: Se calculan los nuevos pesos corregidos para disminuir el error.
+\end{itemize}
+
+Se va a utilizar a partir de ahora notación vectorial con el fin de simplificar las fórmulas y cálculos. Es decir, $w$ será interpretado como un vector y $W$ como una matriz.
+
+\subsection{Variables}
+Vamos a encontrar las siguientes variables:
+
+\begin{itemize}
+    \item $X$: Matriz con los datos de entrenamiento de tamaño $N \times J$ (Individuos $\times$ Características). Se usará $x_n$ como vector que representa a un individuo.
+    
+    \item $y$: Matriz con el valor real de las variables a predecir o \textit{target} para cada individuo. Es de tamaño $N \times K$.
+    
+    \item $W^{(l)}$: Matriz de pesos de tamaño $ M_l \times M_{l-1}$. Cada elemento $w^{(l)}_{ij}$ corresponde al peso de la conexión entre la neurona $i$ de la capa $l$ con la neurona $j$ de la capa $l-1$.
+    
+    \item $z^{(l)}$: Vector con los valores de cada neurona de la capa $l$.
+    
+    \item $g^{l}(z)$: Función de activación de la capa $l$.
+    
+    \item $s^{(l)}$: Valor de cada neurona de la capa $l$ tras aplicar la función de activación $g^{l}(z^{(l)})$
+\end{itemize}
+
+\subsection{\textit{Forward pass}}
+
+Para cada capa, se debe calcular el valor de todas las neuronas e ir propagando los valores hacia delante en la red neuronal hasta llegar a la última capa.
+
+
+El valor de las neuronas de una capa $l$ se calcula de la siguiente forma:
+
+\begin{equation*}
+    s^{(l)} = g^l(z^{(l)})
+\end{equation*}
+
+Donde:
+
+\begin{equation*}
+    z^{(l)} = W^{(l)} \cdot s^{(l-1)} + b^{(l)}
+\end{equation*}
+
+En el caso de la capa de entrada ($l = 0$), $s_0$ = $x_n$
+
+\begin{examplebox}{Ejemplo: Cálculo de la primera iteración de un \textit{forward pass}}
+    Suponemos una red neuronal con 3 capas: entrada, salida y una oculta en medio, de 4, 2 y 1 neurona respectivamente.
+    
+    Los valores para iniciar los pesos de la red neuronal $W^{(l)}$ son un vector de unos para todas las capas. Lo mismo para los vectores de sesgo $b^{(l)}$.
+\end{examplebox}
+
+\subsection{\textit{Backward pass}}
+La forma de entrenar la red neuronal es ir actualizando los pesos en cada iteración para acercar las predicciones a los valores reales de las variables a predecir.
+
+Para esto, hay que definir una función de coste. Usaremos el Error Cuadrático Medio (MSE o \textit{Mean Squared Error})
+
+\begin{equation*}
+    q = \frac{1}{N} \sum_{n = 1}^{N} q_n
+\end{equation*}
+
+Donde $q_n$ es el error del individuo $n$:
+
+\begin{equation*}
+    q_n = \frac{1}{2} \sum_{k = 1}^{K} \left( y_k - s^{(l)}_k \right)^2
+\end{equation*}
+
+Donde:
+
+\begin{itemize}
+    \item $y_k$ es el valor real de la variable $k$ para el individuo $n$
+    \item $s^{(l)}_k$ es el valor estimado de la variable $k$ para el individuo $n$
+\end{itemize}
+
+Ahora que tenemos definida la función de coste podemos calcular el error de la red neuronal en un momento $t$ y reajustar los valores de los parámetros.
+
+La forma de calcular los nuevos valores de los parámetros es mediante el descenso por gradiente o \textit{gradient descent}. Se calcula la derivada de la función de error o coste y se da un paso en la dirección que reduzca el error.
+
+El algoritmo \textbf{\textit{backpropagation}} entra en juego a la hora de enviar el error a las neuronas anteriores a la última capa con el objetivo de recalcular los valores de sus parámetros. Se basa en las derivadas parciales y la regla de la cadena para propagar el error a lo largo de la red.
+
+Para ello primero debemos definir las derivadas parciales en función de cada parámetro.
+
+Supongamos que nuestra función de activación es la función sigmoide:
+
+\begin{equation*}
+    g(x) = \frac{1}{1 + e^{-x}}
+\end{equation*}
