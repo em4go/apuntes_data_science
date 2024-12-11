@@ -1,0 +1,198 @@
+\chapter{Window Functions}\label{ch:window_functions}
+
+Las window functions son una herramienta para realizar cálculos que
+dependen de un conjunto de filas relacionadas, conocidas como
+una ventana.
+
+A diferencia de las funciones de agregación como \texttt{SUM()} o
+\texttt{AVG()}, las window functions no agrupan los resultados en
+una sola fila. En su lugar, devuelven un valor para cada fila.
+
+\section{Qué son las window functions}
+
+Una \textbf{window function} es una función que opera sobre un
+conjunto de filas definidas por una cláusula \texttt{OVER}. A
+este conjunto de filas se le conoce como <<ventana>>.
+
+\subsection{Comparación con funciones de agregación}
+
+\begin{examplebox}{Ejemplo con función de agregación}
+    Media de salarios por departamento con \texttt{GROUP BY}
+\end{examplebox}
+
+Devuelve una fila por departamento y se pierde el detalle de cada empleado.
+\vspace{5pt}
+
+\begin{lstlisting}[language=SQL]
+SELECT department_id, AVG(salary) as avg_salary
+FROM employees
+GROUP BY department_id;
+\end{lstlisting}
+
+
+\begin{examplebox}{Ejemplo con window function}
+    Rango de salarios por departamento con \texttt{OVER}
+\end{examplebox}
+
+Devuelve todas las filas, pero incluye la media de salarios por
+departamento junto a cada empleado.
+\vspace{5pt}
+
+\begin{lstlisting}[language=SQL]
+    SELECT employee_id, department_id, salary,
+    AVG(salary) OVER (PARTITION BY department_id) as avg_salary
+    FROM employees;
+\end{lstlisting}
+
+
+\section{¿Cuándo se usan las window functions?}
+
+\begin{itemize}
+    \item \textbf{Ranking y análisis relativo:}
+    \begin{itemize}
+        \item Determinar el puesto de un empleado dentro de su departamento.
+        \item Comparar ventas de un mes con el promedio anual.
+    \end{itemize}
+    \item \textbf{Cálculos acumulativos:}
+    \begin{itemize}
+        \item Sumar ingresos mes a mes de un cliente.
+        \item Obtener totales acumulativos en un periodo de tiempo.
+    \end{itemize}
+    \item \textbf{Agregados no destructivos:}
+    \begin{itemize}
+        \item Mostrar el promedio o el máximo sin agrupar los resultados.
+    \end{itemize}
+    \item \textbf{Comparaciones entre filas:}
+    \begin{itemize}
+        \item Calcular diferencias entre el salario de un empleado y
+        el promedio de su departamento.
+    \end{itemize}
+    \item \textbf{Análisis de series temporales:}
+    \begin{itemize}
+        \item Calcular la variación de ventas de un producto en el tiempo.
+    \end{itemize}
+\end{itemize}
+
+\section{Sintaxis de las window functions}
+
+Una función agregada tiene la siguiente estructura:
+
+\begin{lstlisting}[language=SQL]
+<function>(<column>) OVER (
+    [PARTITION BY <column>]
+    [ORDER BY <column>]
+    [frame_spec]
+)
+\end{lstlisting}
+
+\begin{enumerate}
+    \item \textbf{Función agregada:}
+    \begin{itemize}
+        \item Por ejemplo: \texttt{SUM}, \texttt{AVG}, \texttt{ROW\_NUMBER}, \texttt{RANK}, \texttt{LEAD}, \texttt{LAG}, etc.
+    \end{itemize}
+    \item \textbf{Cláusula \texttt{OVER}:}
+    \begin{itemize}
+        \item Define el conjunto de filas sobre el que se aplica la función.
+    \end{itemize}
+    \item \textbf{\texttt{PARTITION BY:}}
+    \begin{itemize}
+        \item Divide las filas en subconjuntos independientes.
+        \item Similar a \texttt{GROUP BY}, pero sin colapsar los datos.
+    \end{itemize}
+    \item \textbf{\texttt{ORDER BY:}}
+    \begin{itemize}
+        \item Ordena las filas dentro de cada partición.
+        \item Necesario para cálculos como acumulativos o rankings.
+    \end{itemize}
+    \item \textbf{\texttt{frame\_spec:}}
+    \begin{itemize}
+        \item Define el rango de filas sobre el que se aplica la función.
+        \item Opcional y avanzado.
+    \end{itemize}
+\end{enumerate}
+
+\section{Ejemplos de window functions}
+
+\subsection{Ranking y análisis relativo}
+
+Determinar el ranking de empleados por salario dentro de cada
+departamento.
+
+\begin{lstlisting}[language=SQL]
+SELECT employee_id, department_id, salary,
+    RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) as rank
+FROM employees;
+\end{lstlisting}
+
+\textbf{Funciones de ranking:}
+
+\begin{itemize}
+    \item \texttt{RANK()} devuelve el puesto de cada fila con posibles <<saltos>> en caso de empate.
+    \item \texttt{DENSE\_RANK()} devuelve el puesto sin saltos.
+    \item \texttt{ROW\_NUMBER()} devuelve un número de fila único, por lo que no hay empates.
+\end{itemize}
+
+\subsection{Cálculos acumulativos}
+
+Calcular el total acumulado de ventas por cliente, ordenado por fecha.
+
+\begin{lstlisting}[language=SQL]
+SELECT customer_id, sale_date, amount,
+    SUM(amount) OVER (PARTITION BY customer_id ORDER BY sale_date) as cumulative_total
+FROM sales;
+\end{lstlisting}
+
+\subsection{Comparaciones entre filas}
+
+Calcular la diferencia entre el salario actual y el del empleado anterior
+en el departamento.
+
+\begin{lstlisting}[language=SQL]
+SELECT employee_id, department_id, salary,
+    salary - LAG(salary) OVER (PARTITION BY department_id ORDER BY salary) as salary_diff
+FROM employees;
+\end{lstlisting}
+
+\textbf{Funciones de comparación:}
+
+\begin{itemize}
+    \item \texttt{LEAD()} devuelve el valor de la siguiente fila.
+    \item \texttt{LAG()} devuelve el valor de la fila anterior.
+\end{itemize}
+
+\subsection{Agregados no destructivos}
+
+Mostrar el salario promedio del departamento junto a cada empleado.
+
+\begin{lstlisting}[language=SQL]
+SELECT employee_id, department_id, salary,
+    AVG(salary) OVER (PARTITION BY department_id) as avg_salary
+FROM employees;
+\end{lstlisting}
+
+\subsection{Series temporales}
+
+Calcular el cambio porcentual de ventas mes a mes.
+
+\begin{lstlisting}[language=SQL]
+SELECT sale_date, amount,
+    (amount - LAG(amount) OVER (ORDER BY sale_date)) / LAG(amount) OVER (ORDER BY sale_date) * 100 AS pct_change
+FROM sales;
+\end{lstlisting}
+
+\texttt{LAG(amount)} recupera el valor del mes anterior para calcular
+la diferencia y el cambio porcentual.
+
+\section{Mejorar el rendimiento con window functions}
+
+\begin{itemize}
+    \item \textbf{Usa índices:}
+    \begin{itemize}
+        \item Las columnas en las cláusulas \texttt{PARTITION BY} y \texttt{ORDER BY} pueden beneficiarse de índices.
+    \end{itemize}
+    \item \textbf{Evita recalcular datos repetidamente:}
+    \begin{itemize}
+        \item Las funciones de ventana calculan resultados basados en un
+        solo conjunto de datos, mejorando la eficiencia comparado con subconsultas.
+    \end{itemize}
+\end{itemize}
